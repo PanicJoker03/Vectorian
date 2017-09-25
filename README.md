@@ -1,2 +1,2 @@
 # Vectorian
-A math library.
+A single header math library for OpenGL.
