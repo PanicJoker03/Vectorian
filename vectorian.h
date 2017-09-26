@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+//Use template variables instead...
 #ifndef _USE_MATH_DEFINES
 #define M_PI				3.14159265358979323846
 #define M_PI_2				1.57079632679489661923
@@ -28,9 +28,9 @@ namespace vian{
 	public:
 		T data[size];
 
-		Vector() {
+		Vector() : data{} {
 			M_PI;
-			ZeroMemory(data, sizeof(data));
+			//ZeroMemory(data, sizeof(data));
 		}
 
 		template<typename U>
@@ -58,63 +58,65 @@ namespace vian{
 	class Vector<T, 4> {
 	public:
 		union {
+			//Adding more anonymous struct magic...
 			T data[4];
 			struct { T x, y, z, w; };
 			struct { T r, g, b, a; };
-			Vector<T, 3> xyz;
-			Vector<T, 2> xy;
+			struct { T x; Vector<T, 3> yzw; };
+			struct { T x; Vector<T, 2> yz; T w; };
+			struct { Vector<T, 2> xy, zw; };
+			struct { Vector<T, 3> xyz; T w; };
+			//Vector<T, 3> xyz;
+			//Vector<T, 2> xy;
 			Vector<T, 3> rgb;
 		};
-		Vector() {
-			ZeroMemory(data, sizeof(data));
+		//Prefer initializer list idiom...
+		Vector() : data{} {
+			//ZeroMemory(data, sizeof(data));
 		}
-		Vector(T x, T y, T z, T w) {
-			this->x = x;
-			this->y = y;
-			this->z = z;
-			this->w = w;
+		Vector(T x, T y, T z, T w) : data{x, y ,z ,w} {
 		}
 		template<typename U>
-		Vector(Vector<U, 3> xyz, T w) {
-			this->x = static_cast<T>(xyz.data[0]);
-			this->y = static_cast<T>(xyz.data[1]);
-			this->z = static_cast<T>(xyz.data[2]);
-			this->w = w;
+		Vector(const Vector<U, 3>& xyz, T w) : xyz{ xyz }, w{w} {
+			//this->x = static_cast<T>(xyz.x);
+			//this->y = static_cast<T>(xyz.y);
+			//this->z = static_cast<T>(xyz.z);
+			//this->w = w;
 		}
 		template<typename U>
-		Vector(T x, Vector<U, 3> yzw) {
-			this->x = x;
-			this->y = static_cast<T>(yzw.data[0]);
-			this->z = static_cast<T>(yzw.data[1]);
-			this->w = static_cast<T>(yzw.data[2]);
+		Vector(T x, const Vector<U, 3>& yzw) : x{ x }, yzw{yzw} {
+			//this->x = x;
+			//this->y = static_cast<T>(yzw.y);
+			//this->z = static_cast<T>(yzw.z);
+			//this->w = static_cast<T>(yzw.w);
 		}
 		template<typename U>
-		Vector(Vector<U, 2> xy, T z, T w) {
-			this->x = static_cast<T>(xy.data[0]);
-			this->y = static_cast<T>(xy.data[1]);
-			this->z = z;
-			this->w = w;
+		Vector(const Vector<U, 2>& xy, T z, T w) : xy{ xy }, z{ z }, w{w} {
+			//this->x = static_cast<T>(xy.x);
+			//this->y = static_cast<T>(xy.y);
+			//this->z = z;
+			//this->w = w;
 		}
 		template<typename U>
-		Vector(T x, Vector<U, 2> yz, T w) {
-			this->x = x;
-			this->y = static_cast<T>(yz.data[0]);
-			this->z = static_cast<T>(yz.data[1]);;
-			this->w = w;
+		Vector(T x, const Vector<U, 2>& yz, T w) : x{ x }, yz{ yz }, w{w} {
+			//this->x = x;
+			//this->y = static_cast<T>(yz.y);
+			//this->z = static_cast<T>(yz.z);
+			//this->w = w;
 		}
 		template<typename U>
-		Vector(T x, T y, Vector<U, 2> zw) {
-			this->x = x;
-			this->y = y;
-			this->z = static_cast<T>(zw.data[0]);
-			this->w = static_cast<T>(zw.data[1]);
+		Vector(T x, T y, const Vector<U, 2>& zw) : x{ x }, y{ y }, zw{zw} {
+			//this->x = x;
+			//this->y = y;
+			//this->z = static_cast<T>(zw.z);
+			//this->w = static_cast<T>(zw.w);
 		}
 		template<typename U, typename V>
-		Vector(Vector<U, 2> xy, Vector<V, 2> zw) {
-			this->x = static_cast<T>(xy.data[0]);
-			this->y = static_cast<T>(xy.data[1]);
-			this->z = static_cast<T>(zw.data[0]);
-			this->w = static_cast<T>(zw.data[1]);
+		Vector(const Vector<U, 2>& xy, const Vector<V, 2>& zw) {
+			//this->x = static_cast<T>(xy.x);
+			//this->y = static_cast<T>(xy.y);
+			//this->z = static_cast<T>(zw.z);
+			//this->w = static_cast<T>(zw.w);
 		}
 
 		template<typename U>
@@ -138,27 +140,28 @@ namespace vian{
 			T data[3];
 			struct { T x, y, z; };
 			struct { T r, g, b; };
+			struct { T x; Vector<T, 2> yz; };
 			Vector<T, 2> xy;
 		};
-		Vector() {
-			ZeroMemory(data, sizeof(data));
+		Vector() : data{} {
+			//ZeroMemory(data, sizeof(data));
 		}
-		Vector(T x, T y, T z) {
-			this->x = x;
-			this->y = y;
-			this->z = z;
-		}
-		template<typename U>
-		Vector(Vector<U, 2> xy, T z) {
-			this->x = static_cast<T>(xy.data[0]);
-			this->y = static_cast<T>(xy.data[1]);
-			this->z = z;
+		Vector(T x, T y, T z) : data{x, y, z} {
+			//this->x = x;
+			//this->y = y;
+			//this->z = z;
 		}
 		template<typename U>
-		Vector(T x, Vector<U, 2> yz) {
-			this->x = x;
-			this->y = static_cast<T>(yz.data[0]);
-			this->z = static_cast<T>(yz.data[1]);
+		Vector(const Vector<U, 2>& xy, T z) : xy{ xy }, z{z} {
+			//this->x = static_cast<T>(xy.x);
+			//this->y = static_cast<T>(xy.y);
+			//this->z = z;
+		}
+		template<typename U>
+		Vector(T x, const Vector<U, 2>& yz) : x{ x }, yz{yz} {
+			//this->x = x;
+			//this->y = static_cast<T>(yz.y);
+			//this->z = static_cast<T>(yz.z);
 		}
 		template<typename U>
 		operator Vector<U, 3>() {
@@ -180,12 +183,12 @@ namespace vian{
 			struct { T x, y; };
 		};
 
-		Vector() {
-			ZeroMemory(data, sizeof(data));
+		Vector() : data{} {
+			//ZeroMemory(data, sizeof(data));
 		}
-		Vector(T x, T y) {
-			this->x = x;
-			this->y = y;
+		Vector(T x, T y) : x{ x }, y{y} {
+			//this->x = x;
+			//this->y = y;
 		}
 		template<typename U>
 		operator Vector<U, 2>() {
@@ -207,11 +210,12 @@ namespace vian{
 			struct { T x; };
 		};
 
-		Vector() {
-			ZeroMemory(data, sizeof(data));
+		Vector() : data{} {
+			//ZeroMemory(data, sizeof(data));
 		}
-		Vector(T x, T y) {
-			this->x = x;
+		//???
+		Vector(T x, T y) : x{x} {
+			//this->x = x;
 		}
 		template<typename U>
 		operator Vector<U, 1>() {
