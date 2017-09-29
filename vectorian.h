@@ -1,5 +1,5 @@
-﻿#pragma once
-//Use template variables instead...
+#pragma once
+
 #ifndef _USE_MATH_DEFINES
 #define M_PI				3.14159265358979323846
 #define M_PI_2				1.57079632679489661923
@@ -15,8 +15,7 @@
 #include <cmath>
 #include <string>
 #include <cstdarg>
-#include <Windows.h>
-
+#include <array>
 
 
 namespace vian{
@@ -28,10 +27,7 @@ namespace vian{
 	public:
 		T data[size];
 
-		Vector() : data{} {
-			M_PI;
-			//ZeroMemory(data, sizeof(data));
-		}
+		Vector() : data {} {}
 
 		template<typename U>
 		operator U() {
@@ -41,14 +37,7 @@ namespace vian{
 			}
 			return result;
 		}
-		/* no pude implementar esto :(
-		template<typename  U, typename int size>
-		Vector<T, size>& operator=(const U& rhs) {
-			for (int i = 0; i < size; i++)
-				this->data[i] = static_cast<T>(rhs);
-			return *this;
-		}
-		*/
+
 		T& operator[](int index) {
 			return data[index];
 		}
@@ -62,62 +51,22 @@ namespace vian{
 			T data[4];
 			struct { T x, y, z, w; };
 			struct { T r, g, b, a; };
-			struct { T x; Vector<T, 3> yzw; };
+			struct { Vector<T, 2> xy; T z, w; };
 			struct { T x; Vector<T, 2> yz; T w; };
+			struct { T x, y; Vector<T, 2> zw; };
 			struct { Vector<T, 2> xy, zw; };
 			struct { Vector<T, 3> xyz; T w; };
-			//Vector<T, 3> xyz;
-			//Vector<T, 2> xy;
+			struct { T x; Vector<T, 3> yzw; };
 			Vector<T, 3> rgb;
 		};
-		//Prefer initializer list idiom...
-		Vector() : data{} {
-			//ZeroMemory(data, sizeof(data));
-		}
-		Vector(T x, T y, T z, T w) : data{x, y ,z ,w} {
-		}
-		template<typename U>
-		Vector(const Vector<U, 3>& xyz, T w) : xyz{ xyz }, w{w} {
-			//this->x = static_cast<T>(xyz.x);
-			//this->y = static_cast<T>(xyz.y);
-			//this->z = static_cast<T>(xyz.z);
-			//this->w = w;
-		}
-		template<typename U>
-		Vector(T x, const Vector<U, 3>& yzw) : x{ x }, yzw{yzw} {
-			//this->x = x;
-			//this->y = static_cast<T>(yzw.y);
-			//this->z = static_cast<T>(yzw.z);
-			//this->w = static_cast<T>(yzw.w);
-		}
-		template<typename U>
-		Vector(const Vector<U, 2>& xy, T z, T w) : xy{ xy }, z{ z }, w{w} {
-			//this->x = static_cast<T>(xy.x);
-			//this->y = static_cast<T>(xy.y);
-			//this->z = z;
-			//this->w = w;
-		}
-		template<typename U>
-		Vector(T x, const Vector<U, 2>& yz, T w) : x{ x }, yz{ yz }, w{w} {
-			//this->x = x;
-			//this->y = static_cast<T>(yz.y);
-			//this->z = static_cast<T>(yz.z);
-			//this->w = w;
-		}
-		template<typename U>
-		Vector(T x, T y, const Vector<U, 2>& zw) : x{ x }, y{ y }, zw{zw} {
-			//this->x = x;
-			//this->y = y;
-			//this->z = static_cast<T>(zw.z);
-			//this->w = static_cast<T>(zw.w);
-		}
-		template<typename U, typename V>
-		Vector(const Vector<U, 2>& xy, const Vector<V, 2>& zw) {
-			//this->x = static_cast<T>(xy.x);
-			//this->y = static_cast<T>(xy.y);
-			//this->z = static_cast<T>(zw.z);
-			//this->w = static_cast<T>(zw.w);
-		}
+		Vector() : data{} { }
+		Vector(T x, T y, T z, T w) : data{ x, y ,z ,w } { }
+		Vector(const Vector<T, 3>& xyz, T w) : xyz{ xyz }, w{ w } { }
+		Vector(T x, const Vector<T, 3>& yzw) : x{ x }, yzw{ yzw } { }
+		Vector(const Vector<T, 2>& xy, T z, T w) : xy{ xy }, z{ z }, w{ w } { } 
+		Vector(T x, const Vector<T, 2>& yz, T w) : x{ x }, yz{ yz }, w{ w } { }
+		Vector(T x, T y, const Vector<T, 2>& zw) : x{ x }, y{ y }, zw{ zw } { }
+		Vector(const Vector<T, 2>& xy, const Vector<T, 2>& zw) { }
 
 		template<typename U>
 		operator Vector<U, 4>() {
@@ -141,33 +90,17 @@ namespace vian{
 			struct { T x, y, z; };
 			struct { T r, g, b; };
 			struct { T x; Vector<T, 2> yz; };
-			Vector<T, 2> xy;
+			struct { Vector<T, 2> xy; T z; };
 		};
-		Vector() : data{} {
-			//ZeroMemory(data, sizeof(data));
-		}
-		Vector(T x, T y, T z) : data{x, y, z} {
-			//this->x = x;
-			//this->y = y;
-			//this->z = z;
-		}
-		template<typename U>
-		Vector(const Vector<U, 2>& xy, T z) : xy{ xy }, z{z} {
-			//this->x = static_cast<T>(xy.x);
-			//this->y = static_cast<T>(xy.y);
-			//this->z = z;
-		}
-		template<typename U>
-		Vector(T x, const Vector<U, 2>& yz) : x{ x }, yz{yz} {
-			//this->x = x;
-			//this->y = static_cast<T>(yz.y);
-			//this->z = static_cast<T>(yz.z);
-		}
+		Vector() : data{} { }
+		Vector(T x, T y, T z) : data{ x, y, z } { }
+		Vector(const Vector<T, 2>& xy, T z) : xy{ xy }, z{ z } { }
+		Vector(T x, const Vector<T, 2>& yz) : x{ x }, yz{ yz } { }
 		template<typename U>
 		operator Vector<U, 3>() {
 			return Vector<U, 3>(
-				static_cast<U>(this->x), 
-				static_cast<U>(this->y), 
+				static_cast<U>(this->x),
+				static_cast<U>(this->y),
 				static_cast<U>(this->z));
 		}
 		T& operator[](int index) {
@@ -183,17 +116,13 @@ namespace vian{
 			struct { T x, y; };
 		};
 
-		Vector() : data{} {
-			//ZeroMemory(data, sizeof(data));
-		}
-		Vector(T x, T y) : x{ x }, y{y} {
-			//this->x = x;
-			//this->y = y;
-		}
+		Vector() : data{} { }
+		Vector(T x, T y) : x{ x }, y{ y } { }
+
 		template<typename U>
 		operator Vector<U, 2>() {
 			return Vector<U, 2>(
-				static_cast<U>(this->x), 
+				static_cast<U>(this->x),
 				static_cast<U>(this->y));
 		}
 
@@ -210,13 +139,8 @@ namespace vian{
 			struct { T x; };
 		};
 
-		Vector() : data{} {
-			//ZeroMemory(data, sizeof(data));
-		}
-		//???
-		Vector(T x, T y) : x{x} {
-			//this->x = x;
-		}
+		Vector() : data{} { }
+		Vector(T x ) : x{ x } { }
 		template<typename U>
 		operator Vector<U, 1>() {
 			return Vector<U, 1>(static_cast<U>(this->x));
@@ -244,7 +168,6 @@ namespace vian{
 	using vec4d = Vector<double, 4>;
 	using vec3d = Vector<double, 3>;
 	using vec2d = Vector<double, 2>;
-
 	
 	// Vector + Vector
 	template<typename T, typename U, typename int size>
@@ -281,6 +204,12 @@ namespace vian{
 			result.data[i] = lhs.data[i] * s;
 		return result;
 	}
+	/*
+	//Scalar * Vector
+	template<typename T, typename U, typename int size>
+	Vector<T, size> operator *(const U& rhs, const Vector<T, size>& lhs) {
+		return lhs * rhs;
+	}*/
 
 	//Dot product between two vectors
 	template<typename T, typename U, typename int size>
@@ -383,32 +312,19 @@ namespace vian{
 
 		
 		Matrix() {
-			if (rows == cols)
+			if (rows == cols) {
 				LoadIdentity();
+			}
 		}
 
-		Matrix(std::initializer_list<std::initializer_list<T>> list) {
-			int r = (int)list.size();
-			int c = (int)(list.begin())->size();
-			if (r == rows && c == cols) {
+		Matrix(const std::array<std::array<T, cols>, rows>& args) {
 				for (int i = 0; i < rows; i++) {
 					for (int j = 0; j < cols; j++) {
-						data[i][j] = *((list.begin() + i)->begin() + j);
+						this->data[i][j] = args[i][j];
 					}
 				}
-			}
 		}
-		
-		void LoadIdentity() {
-			for (int i = 0; i < rows; i++) {
-				for (int j = 0; j < cols; j++) {
-					if( i != j)
-						data[i][j] = 0;
-					else
-						data[i][j] = 1;
-				}
-			}
-		}
+
 
 		template<typename U>
 		operator Matrix<U, rows, cols>() {
@@ -420,24 +336,194 @@ namespace vian{
 			}
 			return tmp;
 		}
+
+		void LoadIdentity() {
+			for (int i = 0; i < rows; i++) {
+				for (int j = 0; j < cols; j++) {
+					if (i != j)
+						data[i][j] = 0;
+					else
+						data[i][j] = 1;
+				}
+			}
+		}
+
+		/* NOTE: Should I put these in here?. Maybe a static class for this functions? */
+
+		static Matrix<T, rows, cols> Identity();
+
+		//Returns a matrix translated by a vector
+		static Matrix<T, 4, 4> Translation(const Vector<T, 3>& v);
+		static Matrix<T, 4, 4> Translation(const T& x, const T& y, const T& z);
+
+		/*
+		Returns a matrix rotated by a the angles (radians) given in the x, y and z axis.
+		Order of rotation is Y -> Z -> X;
+		*/
+		static Matrix<T, 4, 4> Rotation(const Vector<T, 3>& v);
+		static Matrix<T, 4, 4> Rotation(const T& x, const T& y, const T& z);
+
+		//Returns a matrix scaled by a vector
+		static Matrix<T, 4, 4> Scale(const Vector<T, 3>& v);
+		static Matrix<T, 4, 4> Scale(const T& x, const T& y, const T& z);
 	};
 
 	template<int rows, int cols>
-	using matrix = Matrix<float, rows, cols>;
+	using mat = Matrix<float, rows, cols>;
 	template<int rows_cols>
-	using matrixn = Matrix<float, rows_cols, rows_cols>;
-	using matrix4 = Matrix<float, 4, 4>;
-	using matrix3 = Matrix<float, 3, 3>;
-	using matrix2 = Matrix<float, 2, 2>;
+	using matn = Matrix<float, rows_cols, rows_cols>;
+	using mat4 = Matrix<float, 4, 4>;
+	using mat3 = Matrix<float, 3, 3>;
+	using mat2 = Matrix<float, 2, 2>;
 
 	template<int rows, int cols>
-	using matrixd = Matrix<double, rows, cols>;
+	using matd = Matrix<double, rows, cols>;
 	template<int rows_cols>
-	using matrixnd = Matrix<double, rows_cols, rows_cols>;
-	using matrix4d = Matrix<double, 4, 4>;
-	using matrix3d = Matrix<double, 3, 3>;
-	using matrix2d = Matrix<double, 2, 2>;
+	using matnd = Matrix<double, rows_cols, rows_cols>;
+	using mat4d = Matrix<double, 4, 4>;
+	using mat3d = Matrix<double, 3, 3>;
+	using mat2d = Matrix<double, 2, 2>;
 
+
+
+	template<typename T, int rows, int cols>
+	static Matrix<T, rows, cols> Identity() {
+		Matrix<T, rows, cols> result;
+		if (rows == cols) {
+			for (int i = 0; i < rows; i++) {
+				for (int j = 0; j < cols; j++) {
+					if (i != j)
+						result.data[i][j] = 0;
+					else
+						result.data[i][j] = 1;
+				}
+			}
+		}
+		return result;
+	}
+
+	//Returns a matrix translated by a vector
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Translation(const Vector<T, 3>& v) {
+		return Matrix<T, rows, cols>::Translation(v.x, v.y, v.z);
+	}
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Translation(const T& x, const T& y, const T& z) {
+		Matrix<T, 4, 4> result;
+		result.data[0][3] = x;
+		result.data[1][3] = y;
+		result.data[2][3] = z;
+		result.data[3][3] = 1;
+		return result;
+	}
+
+	/*
+	Returns a matrix rotated by the angles (radians) given in the x, y and z axis.
+	Order of rotation is Y -> Z -> X;
+	*/
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Rotation(const Vector<T, 3>& v) {
+		return Matrix<T, rows, cols>::Rotation(v.x, v.y, v.z);
+	}
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Rotation(const T& x, const T& y, const T& z) {
+		Matrix<T, 4, 4> result;
+		Matrix<T, 4, 4> Rx;
+		Matrix<T, 4, 4> Ry;
+		Matrix<T, 4, 4> Rz;
+
+		Rx.data[1][1] = cos(x);
+		Rx.data[1][2] = -sin(x);
+		Rx.data[2][1] = sin(x);
+		Rx.data[2][2] = cos(x);
+
+		Ry.data[0][0] = cos(y);
+		Ry.data[0][2] = sin(y);
+		Ry.data[2][0] = -sin(y);
+		Ry.data[2][2] = cos(y);
+
+		Rz.data[0][0] = cos(z);
+		Rz.data[0][1] = -sin(z);
+		Rz.data[1][0] = sin(z);
+		Rz.data[1][1] = cos(z);
+
+		result = Rx * Rz * Ry;
+
+		return result;
+	}
+
+
+
+	//Returns a matrix scaled by a vector
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Scale(const Vector<T, 3>& v) {
+		return Matrix<T, rows, cols>::Scale(v.x, v.y, v.z);
+	}
+	template<typename T, int rows, int cols>
+	Matrix<T, 4, 4> Matrix<T, rows, cols>::Scale(const T& x, const T& y, const T& z) {
+		Matrix<T, 4, 4> result;
+		result.data[0][0] = x;
+		result.data[1][1] = y;
+		result.data[2][2] = z;
+		return result;
+	}
+
+	template<typename T>
+	Matrix<T, 4, 4> Translate(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v){
+		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Translation(v);
+		return tmp * m;
+	}
+
+	template<typename T>
+	Matrix<T, 4, 4> Rotate(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
+		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Rotation(v);
+		return tmp * m;
+	}
+
+	template<typename T>
+	Matrix<T, 4, 4> Scale(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
+		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Scale(v);
+		return tmp * m;
+	}
+
+	// Transpose of a matrix
+	template<typename T, int rows, int cols>
+	Matrix<T, cols, rows> Transpose(const Matrix<T, rows, cols>& m) {
+		Matrix<T, cols, rows> result;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				result.data[j][i] = m.data[i][j];
+			}
+		}
+
+		return result;
+	}
+
+	// Matrix addition
+	template<typename T, typename U, int rows, int cols>
+	Matrix<T, rows, cols> operator+(const Matrix<T, rows, cols>& lhs, const Matrix<U, rows, cols>& rhs) {
+		Matrix<T, rows, cols> result;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				result.data[i][j] = lhs.data[i][j] + static_cast<T>(rhs.data[i][j]);
+			}
+		}
+		return result;
+	}
+
+	// Matrix substraction
+	template<typename T, typename U, int rows, int cols>
+	Matrix<T, rows, cols> operator-(const Matrix<T, rows, cols>& lhs, const Matrix<U, rows, cols>& rhs) {
+		Matrix<T, rows, cols> result;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				result.data[i][j] = lhs.data[i][j] - static_cast<T>(rhs.data[i][j]);
+			}
+		}
+		return result;
+	}
+
+	
 	// Matrix multiplicated by a scalar value
 	template<typename T, typename U, int rows, int cols>
 	T operator*(const Matrix<T, rows, cols>& lhs, const U& rhs) {
@@ -451,6 +537,23 @@ namespace vian{
 		return result;
 	}
 
+	// Matrix 4x4 multiplicated by vector 3
+	template<typename T, typename U>
+	Vector<T, 3> operator*(const Matrix<T, 4, 4>& lhs, const Vector<U, 3>& rhs) {
+		Vector<T, 3> result;
+		Matrix<T, 4, 1> vm;
+		vm.data[0][0] = rhs.data[0];
+		vm.data[1][0] = rhs.data[1];
+		vm.data[2][0] = rhs.data[2];
+		vm.data[3][0] = 1;
+		Matrix<T, 4, 1> r = lhs * vm;
+		result.data[0] = r.data[0][0];
+		result.data[1] = r.data[1][0];
+		result.data[2] = r.data[2][0];
+		return result;
+	}
+
+	// A matrix<m, n> multiplied by a matrix<n, p>
 	template<typename T, typename U, int m, int n, int p>
 	Matrix<T, m, p> operator*(const Matrix<T, m, n>& lhs, const Matrix<U, n, p>& rhs) {
 		Matrix<T, m, p> result;
@@ -465,6 +568,67 @@ namespace vian{
 		}
 		return result;
 	}
+
+	/*
+		Matrix TODO list:
+		- Matrix transfomation
+			- Rotate around an axis of rotation: https://learnopengl.com/#!Getting-started/Transformations
+	*/
+
+	template<typename T>
+	class Quaternion {
+	public:
+		union {
+			T data[4];
+			struct { T w, x, y, z; };
+			struct { T w; Vector<T, 3> xyz; };
+		};
+		Quaternion() : data{} { }
+		Quaternion(T w, T x, T y, T z) {
+			double a = static_cast<double>(w) / 2;
+			this->w = static_cast<T>(cos(a));
+			this->x = x*sin(a);
+			this->y = y*sin(a);
+			this->z = z*sin(a);
+		}
+		Quaternion(T w, Vector<T, 3> xyz){
+			double a = static_cast<double>(w) / 2;
+			this->w = static_cast<T>(cos(a));
+			this->xyz = xyz * sin(a);
+		}
+		template<typename U>
+		operator Quaternion<U>() {
+			return Quaternion<U>(static_cast<U>(w), static_cast<Vector<U,3>>(xyz));
+		}
+	};
+
+	using quatf = Quaternion<float>;
+	using quat = Quaternion<double>;
+
+	template<typename T, typename U>
+	Quaternion<T> operator*(const Quaternion<T>& lhs, const Quaternion<U>& rhs) {
+		Quaternion<T> result;
+		result.w = (static_cast<T>(rhs.w) * lhs.w) - vian::Dot(rhs.xyz, lhs.xyz);
+		result.xyz =  lhs.xyz * static_cast<T>(rhs.w) + rhs.xyz * lhs.w + vian::Cross(lhs.xyz, rhs.xyz);
+		return result;
+	}
+
+	template<typename T, typename U>
+	Vector<T, 3> operator*(const Quaternion<T>& lhs, const Vector<U, 3>& rhs) {
+		Vector<T, 3> result;
+		result = vian::Cross(lhs.xyz, rhs);
+		result = rhs + result * (2 * lhs.w) + (vian::Cross(lhs.xyz, result) * 2);
+		return result;
+	}
+
+	/*
+		Quaterniont TODO list:
+		- slerp
+		- Quaternion * Rotation Matrix
+		- Quaterion -> Rotation Matrix
+		- Euler Angles -> Quaternion
+		- Quaternion -> Euler Angles
+	*/
 
 
 	namespace experimental {
@@ -502,4 +666,67 @@ namespace vian{
 		//}
 	}
 
+
+
+	template<typename T, int size>
+	std::string to_string(const Vector<T, size>& v) {
+		std::string result = "(";
+		for (int i = 0; i < size; i++) {
+			result += std::to_string(v.data[i]);
+			if (i < size - 1) {
+				result += ", ";
+			}
+		}
+		result += ") ";
+		return result;
+	}
+
+	template<typename T, int rows, int cols>
+	std::string to_string(const Matrix<T, rows, cols>& m) {
+		std::string result = "";
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				result += std::to_string(m.data[i][j]) + " ";
+			}
+			result += "\n";
+		}
+		return result;
+	}
+
+	template<typename T>
+	std::string to_string(const Quaternion<T>& q) {
+		std::string result = "(";
+		result += std::to_string(q.w) + ", ";
+		result += std::to_string(q.x) + ", ";
+		result += std::to_string(q.y) + ", ";
+		result += std::to_string(q.z) + ", ";
+		result += ")";
+		return result;
+	}
+
+	template<typename T, int size>
+	std::ostream& operator <<(std::ostream& o, const Vector<T, size>& v) {
+		o << vian::to_string(v);
+		return o;
+	}
+
+	template<typename T, int rows, int cols>
+	std::ostream& operator <<(std::ostream& o, const Matrix<T, rows, cols>& m) {
+		o << vian::to_string(m);
+		return o;
+	}
+
+	template<typename T>
+	std::ostream& operator <<(std::ostream& o, const Quaternion<T>& q) {
+		o << vian::to_string(q);
+		return o;
+	}
+
+	inline double DegToRad(double angle) {
+		return M_DEG_TO_RAD * angle;
+	}
+
+	inline double RadToDeg(double angle) {
+		return M_RAD_TO_DEG * angle;
+	}
 }
