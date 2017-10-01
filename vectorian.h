@@ -42,6 +42,10 @@ namespace vian{
 			return data[index];
 		}
 	};
+	template<typename T> using Vector4 = Vector<T, 4>;
+	template<typename T> using Vector3 = Vector<T, 3>;
+	template<typename T> using Vector2 = Vector<T, 2>;
+	template<typename T> using Vector1 = Vector<T, 2>;
 
 	template<typename T>
 	class Vector<T, 4> {
@@ -51,22 +55,22 @@ namespace vian{
 			T data[4];
 			struct { T x, y, z, w; };
 			struct { T r, g, b, a; };
-			struct { Vector<T, 2> xy; T z, w; };
-			struct { T x; Vector<T, 2> yz; T w; };
-			struct { T x, y; Vector<T, 2> zw; };
-			struct { Vector<T, 2> xy, zw; };
-			struct { Vector<T, 3> xyz; T w; };
-			struct { T x; Vector<T, 3> yzw; };
+			struct { Vector2<T> xy; T z, w; };
+			struct { T x; Vector2<T> yz; T w; };
+			struct { T x, y; Vector2<T> zw; };
+			struct { Vector2<T> xy, zw; };
+			struct { Vector3<T> xyz; T w; };
+			struct { T x; Vector3<T> yzw; };
 			Vector<T, 3> rgb;
 		};
 		Vector() : data{} { }
 		Vector(T x, T y, T z, T w) : data{ x, y ,z ,w } { }
-		Vector(const Vector<T, 3>& xyz, T w) : xyz{ xyz }, w{ w } { }
-		Vector(T x, const Vector<T, 3>& yzw) : x{ x }, yzw{ yzw } { }
-		Vector(const Vector<T, 2>& xy, T z, T w) : xy{ xy }, z{ z }, w{ w } { } 
-		Vector(T x, const Vector<T, 2>& yz, T w) : x{ x }, yz{ yz }, w{ w } { }
-		Vector(T x, T y, const Vector<T, 2>& zw) : x{ x }, y{ y }, zw{ zw } { }
-		Vector(const Vector<T, 2>& xy, const Vector<T, 2>& zw) { }
+		Vector(const Vector3<T>& xyz, T w) : xyz{ xyz }, w{ w } { }
+		Vector(T x, const Vector3<T>& yzw) : x{ x }, yzw{ yzw } { }
+		Vector(const Vector2<T>& xy, T z, T w) : xy{ xy }, z{ z }, w{ w } { } 
+		Vector(T x, const Vector2<T>& yz, T w) : x{ x }, yz{ yz }, w{ w } { }
+		Vector(T x, T y, const Vector2<T>& zw) : x{ x }, y{ y }, zw{ zw } { }
+		Vector(const Vector2<T>& xy, const Vector2<T>& zw) { }
 
 		template<typename U>
 		operator Vector<U, 4>() {
@@ -89,13 +93,13 @@ namespace vian{
 			T data[3];
 			struct { T x, y, z; };
 			struct { T r, g, b; };
-			struct { T x; Vector<T, 2> yz; };
-			struct { Vector<T, 2> xy; T z; };
+			struct { T x; Vector2<T> yz; };
+			struct { Vector2<T> xy; T z; };
 		};
 		Vector() : data{} { }
 		Vector(T x, T y, T z) : data{ x, y, z } { }
-		Vector(const Vector<T, 2>& xy, T z) : xy{ xy }, z{ z } { }
-		Vector(T x, const Vector<T, 2>& yz) : x{ x }, yz{ yz } { }
+		Vector(const Vector2<T>& xy, T z) : xy{ xy }, z{ z } { }
+		Vector(T x, const Vector2<T>& yz) : x{ x }, yz{ yz } { }
 		template<typename U>
 		operator Vector<U, 3>() {
 			return Vector<U, 3>(
@@ -153,21 +157,21 @@ namespace vian{
 
 	template<typename int size>
 	using vecn = Vector<float, size>;
-	using vec4 = Vector<float, 4>;
-	using vec3 = Vector<float, 3>;
-	using vec2 = Vector<float, 2>;
+	using vec4 = Vector4<float>;
+	using vec3 = Vector3<float>;
+	using vec2 = Vector2<float>;
 
 	template<typename int size>
 	using vecni = Vector<int, size>;
-	using vec4i = Vector<int, 4>;
-	using vec3i = Vector<int, 3>;
-	using vec2i = Vector<int, 2>;
+	using vec4i = Vector4<int>;
+	using vec3i = Vector3<int>;
+	using vec2i = Vector2<int>;
 
 	template<typename int size>
 	using vecnd = Vector<double, size>;
-	using vec4d = Vector<double, 4>;
-	using vec3d = Vector<double, 3>;
-	using vec2d = Vector<double, 2>;
+	using vec4d = Vector4<double>;
+	using vec3d = Vector3<double>;
+	using vec2d = Vector2<double>;
 	
 	// Vector + Vector
 	template<typename T, typename U, typename int size>
@@ -222,8 +226,8 @@ namespace vian{
 
 	//Cross product between two vectors
 	template<typename T, typename U>
-	Vector<T,3> Cross(const Vector<T, 3>& lhs, const Vector<U, 3>& rhs) {
-		Vector<T, 3> result;
+	Vector3<T> Cross(const Vector3<T>& lhs, const Vector3<U>& rhs) {
+		Vector3<T> result;
 
 		result.data[0] = (lhs.data[1] * static_cast<T>(rhs.data[2])) - (lhs.data[2] * static_cast<T>(rhs.data[1]));
 		result.data[1] = (lhs.data[2] * static_cast<T>(rhs.data[0])) - (lhs.data[0] * static_cast<T>(rhs.data[2]));
@@ -309,10 +313,13 @@ namespace vian{
 	class Matrix{
 	public:
 		T data[rows][cols] = {};
-
+		// It may help for multiplication constraints at compile time...
+		static constexpr int matRows = rows;
+		static constexpr int matCols = cols;
 		
 		Matrix() {
-			if (rows == cols) {
+			// check at compile time with 'if constexpr'?
+			if (matRows == matCols) {
 				LoadIdentity();
 			}
 		}
@@ -349,25 +356,28 @@ namespace vian{
 		}
 
 		/* NOTE: Should I put these in here?. Maybe a static class for this functions? */
-
+		/* Or even in as free functions, they could be wrapped in a namespace...*/
+	private:
+		using Matrix4x4 = Matrix<T, 4, 4>;
+	public:
 		static Matrix<T, rows, cols> Identity();
 
 		//Returns a matrix translated by a vector
-		static Matrix<T, 4, 4> Translation(const Vector<T, 3>& v);
-		static Matrix<T, 4, 4> Translation(const T& x, const T& y, const T& z);
+		static Matrix4x4 Translation(const Vector3<T>& v);
+		static Matrix4x4 Translation(const T& x, const T& y, const T& z);
 
 		/*
 		Returns a matrix rotated by a the angles (radians) given in the x, y and z axis.
 		Order of rotation is Y -> Z -> X;
 		*/
-		static Matrix<T, 4, 4> Rotation(const Vector<T, 3>& v);
-		static Matrix<T, 4, 4> Rotation(const T& x, const T& y, const T& z);
+		static Matrix4x4 Rotation(const Vector3<T>& v);
+		static Matrix4x4 Rotation(const T& x, const T& y, const T& z);
 
 		//Returns a matrix scaled by a vector
-		static Matrix<T, 4, 4> Scale(const Vector<T, 3>& v);
-		static Matrix<T, 4, 4> Scale(const T& x, const T& y, const T& z);
+		static Matrix4x4 Scale(const Vector3<T>& v);
+		static Matrix4x4 Scale(const T& x, const T& y, const T& z);
 	};
-
+	template<typename T> using Matrix4x4 = Matrix<T, 4, 4>;
 	template<int rows, int cols>
 	using mat = Matrix<float, rows, cols>;
 	template<int rows_cols>
@@ -404,12 +414,12 @@ namespace vian{
 
 	//Returns a matrix translated by a vector
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Translation(const Vector<T, 3>& v) {
+	Matrix4x4<T> Matrix<T, rows, cols>::Translation(const Vector3<T>& v) {
 		return Matrix<T, rows, cols>::Translation(v.x, v.y, v.z);
 	}
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Translation(const T& x, const T& y, const T& z) {
-		Matrix<T, 4, 4> result;
+	Matrix4x4<T> Matrix<T, rows, cols>::Translation(const T& x, const T& y, const T& z) {
+		Matrix4x4 result;
 		result.data[0][3] = x;
 		result.data[1][3] = y;
 		result.data[2][3] = z;
@@ -422,15 +432,15 @@ namespace vian{
 	Order of rotation is Y -> Z -> X;
 	*/
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Rotation(const Vector<T, 3>& v) {
+	Matrix4x4<T> Matrix<T, rows, cols>::Rotation(const Vector3<T>& v) {
 		return Matrix<T, rows, cols>::Rotation(v.x, v.y, v.z);
 	}
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Rotation(const T& x, const T& y, const T& z) {
-		Matrix<T, 4, 4> result;
-		Matrix<T, 4, 4> Rx;
-		Matrix<T, 4, 4> Ry;
-		Matrix<T, 4, 4> Rz;
+	Matrix4x4<T> Matrix<T, rows, cols>::Rotation(const T& x, const T& y, const T& z) {
+		Matrix4x4 result;
+		Matrix4x4 Rx;
+		Matrix4x4 Ry;
+		Matrix4x4 Rz;
 
 		Rx.data[1][1] = cos(x);
 		Rx.data[1][2] = -sin(x);
@@ -456,12 +466,12 @@ namespace vian{
 
 	//Returns a matrix scaled by a vector
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Scale(const Vector<T, 3>& v) {
+	Matrix4x4<T> Matrix<T, rows, cols>::Scale(const Vector3<T>& v) {
 		return Matrix<T, rows, cols>::Scale(v.x, v.y, v.z);
 	}
 	template<typename T, int rows, int cols>
-	Matrix<T, 4, 4> Matrix<T, rows, cols>::Scale(const T& x, const T& y, const T& z) {
-		Matrix<T, 4, 4> result;
+	Matrix4x4<T> Matrix<T, rows, cols>::Scale(const T& x, const T& y, const T& z) {
+		Matrix4x4 result;
 		result.data[0][0] = x;
 		result.data[1][1] = y;
 		result.data[2][2] = z;
@@ -469,20 +479,20 @@ namespace vian{
 	}
 
 	template<typename T>
-	Matrix<T, 4, 4> Translate(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v){
-		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Translation(v);
+	Matrix4x4<T> Translate(const Matrix4x4<T>& m, const Vector3<T>& v){
+		Matrix4x4<T> tmp = Matrix4x4<T>::Translation(v);
 		return tmp * m;
 	}
 
 	template<typename T>
-	Matrix<T, 4, 4> Rotate(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
-		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Rotation(v);
+	Matrix4x4<T> Rotate(const Matrix4x4<T>& m, const Vector3<T>& v) {
+		Matrix4x4<T> tmp = Matrix4x4<T>::Rotation(v);
 		return tmp * m;
 	}
 
 	template<typename T>
-	Matrix<T, 4, 4> Scale(const Matrix<T, 4, 4>& m, const Vector<T, 3>& v) {
-		Matrix<T, 4, 4> tmp = Matrix<T, 4, 4>::Scale(v);
+	Matrix4x4<T> Scale(const Matrix4x4<T>& m, const Vector3<T>& v) {
+		Matrix4x4<T> tmp = Matrix4x4<T>::Scale(v);
 		return tmp * m;
 	}
 
@@ -539,8 +549,8 @@ namespace vian{
 
 	// Matrix 4x4 multiplicated by vector 3
 	template<typename T, typename U>
-	Vector<T, 3> operator*(const Matrix<T, 4, 4>& lhs, const Vector<U, 3>& rhs) {
-		Vector<T, 3> result;
+	Vector3<T> operator*(const Matrix4x4<T>& lhs, const Vector3<U>& rhs) {
+		Vector3<T> result;
 		Matrix<T, 4, 1> vm;
 		vm.data[0][0] = rhs.data[0];
 		vm.data[1][0] = rhs.data[1];
@@ -581,7 +591,7 @@ namespace vian{
 		union {
 			T data[4];
 			struct { T w, x, y, z; };
-			struct { T w; Vector<T, 3> xyz; };
+			struct { T w; Vector3<T> xyz; };
 		};
 		Quaternion() : data{} { }
 		Quaternion(T w, T x, T y, T z) {
@@ -591,14 +601,14 @@ namespace vian{
 			this->y = y*sin(a);
 			this->z = z*sin(a);
 		}
-		Quaternion(T w, Vector<T, 3> xyz){
+		Quaternion(T w, Vector3<T> xyz){
 			double a = static_cast<double>(w) / 2;
 			this->w = static_cast<T>(cos(a));
 			this->xyz = xyz * sin(a);
 		}
 		template<typename U>
 		operator Quaternion<U>() {
-			return Quaternion<U>(static_cast<U>(w), static_cast<Vector<U,3>>(xyz));
+			return Quaternion<U>(static_cast<U>(w), static_cast<Vector3<U>>(xyz));
 		}
 	};
 
@@ -614,8 +624,8 @@ namespace vian{
 	}
 
 	template<typename T, typename U>
-	Vector<T, 3> operator*(const Quaternion<T>& lhs, const Vector<U, 3>& rhs) {
-		Vector<T, 3> result;
+	Vector3<T> operator*(const Quaternion<T>& lhs, const Vector3<U>& rhs) {
+		Vector3<T> result;
 		result = vian::Cross(lhs.xyz, rhs);
 		result = rhs + result * (2 * lhs.w) + (vian::Cross(lhs.xyz, result) * 2);
 		return result;
